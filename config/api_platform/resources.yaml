@@ -1,0 +1,6 @@
+##
+# Separated entity mapping configuration from this file
+##
+
+resources:
+  App\Entity\Post : ~ # ~ = Basic configuration
