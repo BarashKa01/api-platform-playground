@@ -9,7 +9,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=PostRepository::class)
- * @ApiResource(normalizationContext={"groups" = {"read:collection"}})
+ * @ApiResource(
+ *     normalizationContext={"groups" = {"read:collection"}},
+ *     itemOperations={
+ *          "put"={
+                "denormalization_context"={
+ *                  "groups"={"put:Post"}
+ *              }
+ *          },
+ *          "delete",
+ *          "get"={
+ *              "normalization_context"={
+ *                  "groups"={"read:collection", "read:item", "read:Post"}
+ *              }
+ *          }
+ *     }
+ * )
  */
 class Post
 {
@@ -29,27 +44,31 @@ class Post
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:collection"})
+     * @Groups({"read:collection", "put:Post"})
      */
     private $slug;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"read:item"})
      */
     private $content;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"read:item"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"read:item"})
      */
     private $updatedAt;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="posts")
+     * @Groups({"read:item", "put:Post"})
      */
     private $category;
 
