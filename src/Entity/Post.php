@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     collectionOperations={
  *      "get",
  *      "post"={
- *          "validation_groups"={"create:Post"}
+ *          "validation_groups"={Post::class, "ValidationGroups"}
  *     }},
  *     itemOperations={
  *          "put"={
@@ -154,5 +154,9 @@ class Post
         $this->category = $category;
 
         return $this;
+    }
+
+    public static function validationGroups(self $post) {
+        return ["create:Post"];
     }
 }
