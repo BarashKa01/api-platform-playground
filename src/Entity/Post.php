@@ -4,14 +4,15 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\PostRepository;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=PostRepository::class)
  * @ApiResource(
  *     normalizationContext={"groups" = {"read:collection"}},
+ *     denormalizationContext={"groups" = {"write:Post"}},
  *     collectionOperations={
  *      "get",
  *      "post"={
@@ -44,38 +45,39 @@ class Post
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:collection"})
+     * @Groups({"read:collection", "write:Post"})
      * @Assert\Length(min=5, groups={"create:Post"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read:collection", "put:Post"})
+     * @Groups({"read:collection", "put:Post", "write:Post"})
      */
     private $slug;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"read:item"})
+     * @Groups({"read:item", "write:Post"})
      */
     private $content;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"read:item"})
+     * @Groups({"read:item", "write:Post"})
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"read:item"})
+     * @Groups({"read:item", "write:Post"})
      */
     private $updatedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="posts")
-     * @Groups({"read:item", "put:Post"})
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="posts", cascade={"persist"})
+     * @Groups({"read:item", "write:Post"})
+     * @Assert\Valid()
      */
     private $category;
 
