@@ -7,6 +7,8 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\PostRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
+use App\Controller\PostPublishController;
+use App\Controller\PostCountController;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,10 +24,47 @@ use Doctrine\ORM\Mapping as ORM;
  *      "get",
  *      "post"={
  *          "validation_groups"={Post::class, "ValidationGroups"}
- *     }},
+ *      },
+ *      "count"={
+ *          "method"="GET",
+ *          "path"="/posts/count",
+ *          "controller"=PostCountController::class,
+ *          "read"=false,
+ *          "pagination_enabled"=false,
+ *          "filters"={},
+ *          "openapi_context"={
+                "summary"="Retrieve total posts count",
+ *              "parameters"={
+                    {
+ *                      "in"="query",
+ *                      "name"="online",
+ *                      "schema"={
+                            "type"="integer",
+ *                          "maximum"=1,
+ *                          "minimum"=0
+ *                      },
+ *                      "description"="Filter posts which are published"
+ *                  }
+ *              },
+ *           "responses"={
+                "200"={
+ *                  "description"="OK",
+ *                  "content"={
+                        "application/json"={
+ *                          "schema"={
+                                "type"="integer",
+ *                              "example"=4
+ *                          }
+ *                      }
+ *                  }
+ *              }
+ *          }
+ *          }
+ *          }
+ *     },
  *     itemOperations={
  *          "put"={
-                "denormalization_context"={
+ *              "denormalization_context"={
  *                  "groups"={"put:Post"}
  *              }
  *          },
@@ -34,7 +73,22 @@ use Doctrine\ORM\Mapping as ORM;
  *              "normalization_context"={
  *                  "groups"={"read:collection", "read:item", "read:Post"}
  *              }
- *          }
+ *          },
+ *          "publish"={
+                "method"="POST",
+ *              "path"="/post/{id}/publish",
+ *              "controller"=PostPublishController::class,
+ *              "openapi_context"={
+                    "summary"="Publish or unpublish a post",
+ *                  "request_body"={
+                        "content"={
+ *                          "application/json"={
+                                "schema"= {}
+ *                          }
+ *                      }
+ *                  },
+ *              },
+ *          },
  *     }
  * )
  * @ApiFilter(SearchFilter::class, properties={"id":"exact", "title":"partial"})
@@ -86,6 +140,12 @@ class Post
      * @Assert\Valid()
      */
     private $category;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default":"0"})
+     * @Groups({"read:collection"})
+     */
+    private $online = false;
 
     public function getId(): ?int
     {
@@ -166,5 +226,17 @@ class Post
 
     public static function validationGroups(self $post) {
         return ["create:Post"];
+    }
+
+    public function getOnline(): ?bool
+    {
+        return $this->online;
+    }
+
+    public function setOnline(bool $online): self
+    {
+        $this->online = $online;
+
+        return $this;
     }
 }
