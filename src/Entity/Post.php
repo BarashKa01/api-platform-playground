@@ -13,6 +13,9 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource(
  *     normalizationContext={"groups" = {"read:collection"}},
  *     denormalizationContext={"groups" = {"write:Post"}},
+ *     paginationItemsPerPage=2,
+ *     paginationMaximumItemsPerPage=2,
+ *     paginationClientItemsPerPage=true,
  *     collectionOperations={
  *      "get",
  *      "post"={
